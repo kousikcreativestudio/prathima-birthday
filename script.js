@@ -1,4 +1,4 @@
-const TARGET_BUTTERFLIES = 8;
+const TARGET_BUTTERFLIES = 20;
 const CACHE_VERSION = '303';
 
 const app = document.getElementById('app');

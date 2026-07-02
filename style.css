@@ -81,7 +81,7 @@ body{
     radial-gradient(circle at 80% 18%, rgba(255,113,220,.20), transparent 24%),
     radial-gradient(circle at 50% 92%, rgba(60,210,134,.35), transparent 28%),
     linear-gradient(160deg,#050a27 0%,#092753 48%,#35194e 100%);
-  animation:skyMove 12s ease-in-out infinite alternate;
+  animation:skyMove 8s ease-in-out infinite alternate;
 }
 
 .skyDecor::before,
@@ -96,13 +96,13 @@ body{
   background-size:72px 86px, 98px 116px, 132px 146px;
   background-position:5px 11px, 30px 8px, 17px 40px;
   opacity:.78;
-  animation:starsFloat 18s linear infinite;
+  animation:starsFloat 12s linear infinite;
 }
 
 .skyDecor::after{
   opacity:.34;
   filter:blur(1px);
-  animation-duration:28s;
+  animation-duration:18s;
   transform:scale(1.12);
 }
 
@@ -113,12 +113,12 @@ body{
 
 @keyframes skyMove{
   from{transform:scale(1.02) translateY(0)}
-  to{transform:scale(1.08) translateY(-18px)}
+  to{transform:scale(1.08) translateY(-26px)}
 }
 
 @keyframes starsFloat{
   from{transform:translateY(0)}
-  to{transform:translateY(70px)}
+  to{transform:translateY(95px)}
 }
 
 .flowerBed{
@@ -291,11 +291,19 @@ body{
   width:58px;
   height:58px;
   z-index:6;
+  border:0;
+  outline:none;
+  background:transparent;
+  box-shadow:none;
+  padding:0;
+  line-height:1;
   filter:drop-shadow(0 0 12px rgba(129,235,255,.9)) drop-shadow(0 0 24px rgba(255,123,221,.35));
   animation:butterflyFly linear forwards, butterflyBeat .7s ease-in-out infinite;
   cursor:pointer;
   user-select:none;
   touch-action:manipulation;
+  -webkit-appearance:none;
+  appearance:none;
 }
 
 @keyframes butterflyFly{
@@ -327,32 +335,32 @@ body{
   color:#fff2ca;
 }
 
-.roseButton{
+.giftButton{
   position:relative;
-  width:min(66vw,260px);
+  width:min(62vw,220px);
   aspect-ratio:1/1;
   border:0;
   background:transparent;
   cursor:pointer;
   touch-action:manipulation;
-  animation:roseFloat 2.5s ease-in-out infinite;
-  filter:drop-shadow(0 0 32px rgba(255,122,212,.85));
+  animation:giftFloat 2.2s ease-in-out infinite;
+  filter:drop-shadow(0 0 32px rgba(255,204,84,.85));
 }
 
-@keyframes roseFloat{
+@keyframes giftFloat{
   0%,100%{transform:translateY(0) rotate(0)}
-  50%{transform:translateY(-14px) rotate(3deg)}
+  50%{transform:translateY(-12px) rotate(2deg)}
 }
 
-.roseButton.open{animation:roseOpen .75s ease forwards}
+.giftButton.open{animation:giftOpen .75s ease forwards}
 
-@keyframes roseOpen{
+@keyframes giftOpen{
   0%{transform:scale(1)}
-  55%{transform:scale(1.15) rotate(-4deg)}
+  55%{transform:scale(1.14) rotate(-4deg)}
   100%{transform:scale(.55) rotate(12deg); opacity:0}
 }
 
-.roseCore,.rosePetal,.roseGlow{
+.giftButton span{
   position:absolute;
   left:50%;
   top:50%;
@@ -360,37 +368,71 @@ body{
   pointer-events:none;
 }
 
-.roseGlow{
+.giftGlow{
   width:100%;
   height:100%;
   border-radius:50%;
-  background:radial-gradient(circle, rgba(255,187,235,.50), transparent 62%);
-  animation:roseGlow 1.5s ease-in-out infinite;
+  background:radial-gradient(circle, rgba(255,225,141,.42), transparent 62%);
+  animation:giftGlow 1.5s ease-in-out infinite;
 }
 
-@keyframes roseGlow{50%{transform:translate(-50%,-50%) scale(1.12); opacity:.72}}
+@keyframes giftGlow{50%{transform:translate(-50%,-50%) scale(1.12); opacity:.74}}
 
-.roseCore{
-  z-index:5;
-  width:82px;
-  height:82px;
-  border-radius:50%;
-  background:radial-gradient(circle at 32% 30%,#fff6fb,#ff90d8 36%,#a21776 75%);
-  box-shadow:inset -12px -14px 22px rgba(59,0,44,.28), 0 0 30px rgba(255,152,226,.85);
-}
-
-.rosePetal{
+.giftBoxBase{
   width:128px;
-  height:82px;
-  border-radius:80px 10px 80px 10px;
-  background:linear-gradient(135deg,#fff0fb,#ff85d5 40%,#c9248e 100%);
-  box-shadow:inset -8px -10px 20px rgba(98,0,76,.25);
+  height:102px;
+  top:58%;
+  border-radius:16px;
+  background:linear-gradient(145deg,#ffe9a3 0%, #ffc84c 35%, #ff9d24 100%);
+  box-shadow:inset 0 -10px 18px rgba(161,84,0,.22),0 0 30px rgba(255,205,93,.55);
 }
 
-.p1{transform:translate(-50%,-82%) rotate(28deg)}
-.p2{transform:translate(-20%,-48%) rotate(103deg)}
-.p3{transform:translate(-76%,-48%) rotate(-28deg)}
-.p4{transform:translate(-50%,-18%) rotate(208deg)}
+.giftLid{
+  width:144px;
+  height:36px;
+  top:31%;
+  border-radius:14px;
+  background:linear-gradient(145deg,#fff0b7 0%, #ffd65f 48%, #ffae30 100%);
+  box-shadow:inset 0 -6px 12px rgba(161,84,0,.18),0 10px 16px rgba(0,0,0,.16);
+}
+
+.giftRibbonV{
+  width:22px;
+  height:138px;
+  top:50%;
+  border-radius:12px;
+  background:linear-gradient(180deg,#ff73cc,#ff4fac);
+  box-shadow:0 0 18px rgba(255,102,200,.4);
+}
+
+.giftRibbonH{
+  width:152px;
+  height:22px;
+  top:42%;
+  border-radius:12px;
+  background:linear-gradient(90deg,#ff73cc,#ff4fac);
+  box-shadow:0 0 18px rgba(255,102,200,.36);
+}
+
+.giftBow{
+  width:48px;
+  height:34px;
+  top:22%;
+  background:linear-gradient(145deg,#ff9be0,#ff59bb 60%,#e43699);
+  box-shadow:inset -4px -6px 10px rgba(130,0,74,.16);
+}
+
+.bowLeft{
+  left:39%;
+  border-radius:50px 10px 50px 12px;
+  transform:translate(-50%,-50%) rotate(-28deg);
+}
+
+.bowRight{
+  left:61%;
+  border-radius:10px 50px 12px 50px;
+  transform:translate(-50%,-50%) rotate(28deg);
+}
 
 .wishCard{
   position:absolute;
@@ -555,6 +597,15 @@ body{
   letter-spacing:2.8px;
   font-size:12px;
   color:rgba(255,255,255,.76);
+}
+
+.fromBrother{
+  margin:16px auto 0;
+  font-family:"Brush Script MT","Segoe Script",cursive;
+  font-size:26px;
+  line-height:1.2;
+  color:#ffe8ac;
+  text-shadow:0 0 10px rgba(255,233,159,.72),0 0 26px rgba(255,174,84,.34);
 }
 
 .finalCard .smallBtn{

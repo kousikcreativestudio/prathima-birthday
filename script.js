@@ -1,5 +1,5 @@
 const TARGET_BUTTERFLIES = 8;
-const CACHE_VERSION = '301';
+const CACHE_VERSION = '302';
 
 const app = document.getElementById('app');
 const flash = document.getElementById('flash');
@@ -181,7 +181,7 @@ function spawnButterfly(initial=false){
   const butterfly = document.createElement('button');
   butterfly.className = 'butterfly';
   butterfly.type = 'button';
-  butterfly.textContent = Math.random() > .5 ? '🦋' : '💙';
+  butterfly.textContent = '🦋';
 
   const w = app.clientWidth;
   const h = app.clientHeight;

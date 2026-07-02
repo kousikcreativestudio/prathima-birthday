@@ -1,71 +1,75 @@
-const TARGET_BUTTERFLIES = 12;
-const PHOTO_SOURCES = [
-  './photos/main-photo.jpg',
-  './photos/main-photo.jpeg',
-  './photos/main-photo.png',
-  './photos/photo.jpg',
-  './photos/photo1.jpg'
-];
-
-let collected = 0;
-let gameRunning = false;
-let spawnTimer = null;
-let audioCtx = null;
-let musicStarted = false;
-let musicTimer = null;
-let musicIndex = 0;
-let activeNodes = [];
-let particleTimer = null;
+const TARGET_BUTTERFLIES = 8;
+const CACHE_VERSION = '301';
 
 const app = document.getElementById('app');
-const personName = (app.dataset.personName || 'SAHITYA').trim();
+const flash = document.getElementById('flash');
+const sparkLayer = document.getElementById('sparkLayer');
+const gameLayer = document.getElementById('gameLayer');
+const progressBox = document.getElementById('progressBox');
+const photoFrame = document.getElementById('photoFrame');
+const mainPhoto = document.getElementById('mainPhoto');
 
 const screens = {
   start: document.getElementById('startScreen'),
   game: document.getElementById('gameScreen'),
-  gift: document.getElementById('giftScreen'),
+  bloom: document.getElementById('bloomScreen'),
   wish: document.getElementById('wishScreen'),
   photo: document.getElementById('photoScreen'),
   final: document.getElementById('finalScreen')
 };
 
-const playBtn = document.getElementById('playBtn');
-const score = document.getElementById('score');
-const gameLayer = document.getElementById('gameLayer');
-const moonGate = document.getElementById('moonGate');
-const flash = document.getElementById('flash');
-const openPhotoBtn = document.getElementById('openPhotoBtn');
+const startBtn = document.getElementById('startBtn');
+const openBloomBtn = document.getElementById('openBloomBtn');
+const photoBtn = document.getElementById('photoBtn');
 const finalBtn = document.getElementById('finalBtn');
 const replayBtn = document.getElementById('replayBtn');
-const mainPhoto = document.getElementById('mainPhoto');
-const photoFrame = document.querySelector('.photoFrame');
-const nameTitle = document.getElementById('nameTitle');
-const finalName = document.getElementById('finalName');
-const canvas = document.getElementById('skyCanvas');
-const ctx = canvas.getContext('2d');
 
-nameTitle.textContent = personName;
-finalName.textContent = personName;
+let collected = 0;
+let gameRunning = false;
+let spawnTimer = null;
+let audioCtx = null;
+let musicTimer = null;
+let musicStarted = false;
+let activeNodes = [];
+let tapLock = false;
 
-function show(screenName){
+const photoCandidates = [
+  'photos/prathima.jpg',
+  'photos/prathima.JPG',
+  'photos/prathima.jpeg',
+  'photos/prathima.JPEG',
+  'photos/prathima.png',
+  'photos/prathima.PNG',
+  'photos/prathima.webp',
+  'photos/Prathima.jpg',
+  'photos/Prathima.png',
+  'photos/main-photo.jpg',
+  'photos/main-photo.JPG',
+  'photos/main-photo.jpeg',
+  'photos/main-photo.png',
+  'photos/main-photo.PNG',
+  'photos/main-photo.webp',
+  'photos/photo.jpg',
+  'photos/photo.JPG',
+  'photos/photo.jpeg',
+  'photos/photo.png',
+  'photos/photo.webp',
+  'photos/photo1.jpg',
+  'photos/photo1.JPG',
+  'photos/photo1.jpeg',
+  'photos/photo1.png',
+  'photos/fullphoto.jpg',
+  'photos/fullphoto.JPG',
+  'photos/fullphoto.jpeg',
+  'photos/fullphoto.png',
+  'assets/photo.jpg',
+  'assets/main-photo.jpg'
+];
+
+function show(name){
   Object.values(screens).forEach(screen => screen.classList.remove('active'));
-  screens[screenName].classList.add('active');
-
-  if(screenName !== 'wish') screens.wish.classList.remove('ready');
-  if(screenName === 'final') stopMusicSoon();
+  screens[name].classList.add('active');
 }
-
-function resizeCanvas(){
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.floor(app.clientWidth * dpr);
-  canvas.height = Math.floor(app.clientHeight * dpr);
-  canvas.style.width = app.clientWidth + 'px';
-  canvas.style.height = app.clientHeight + 'px';
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 function initAudio(){
   if(!audioCtx){
@@ -74,97 +78,95 @@ function initAudio(){
   if(audioCtx.state === 'suspended') audioCtx.resume();
   if(!musicStarted){
     musicStarted = true;
-    startMusic();
+    playMusicLoop();
   }
 }
 
-function tone(freq, dur = .18, type = 'sine', vol = .06, delay = 0){
+function tone(freq, dur=.18, type='sine', vol=.055, delay=0){
   if(!audioCtx || !freq) return;
   const t = audioCtx.currentTime + delay;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
-  activeNodes.push({osc, gain});
+  activeNodes.push({osc,gain});
   osc.type = type;
   osc.frequency.setValueAtTime(freq, t);
-  gain.gain.setValueAtTime(0.0001, t);
-  gain.gain.linearRampToValueAtTime(vol, t + .025);
-  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-
+  gain.gain.setValueAtTime(.0001, t);
+  gain.gain.linearRampToValueAtTime(vol, t + .02);
+  gain.gain.exponentialRampToValueAtTime(.0001, t + dur);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-  osc.start(t);
-  osc.stop(t + dur + .04);
   osc.onended = () => {
+    activeNodes = activeNodes.filter(n => n.osc !== osc);
     try{ osc.disconnect(); gain.disconnect(); }catch(e){}
-    activeNodes = activeNodes.filter(node => node.osc !== osc);
   };
+  osc.start(t);
+  osc.stop(t + dur + .05);
 }
 
-function collectSound(){
-  tone(740,.1,'triangle',.07);
-  tone(1180,.18,'sine',.055,.05);
+function sparkleSound(){
+  tone(740,.08,'triangle',.06);
+  tone(1180,.13,'sine',.045,.05);
 }
 
-function gateSound(){
-  tone(196,.28,'sine',.07);
-  tone(392,.38,'triangle',.075,.12);
-  tone(784,.55,'sine',.06,.28);
-  tone(1175,.65,'triangle',.04,.42);
+function openSound(){
+  tone(220,.18,'sine',.07);
+  tone(440,.28,'triangle',.07,.08);
+  tone(880,.36,'sine',.055,.20);
+  tone(1320,.42,'triangle',.04,.34);
 }
 
 function photoSound(){
-  tone(330,.20,'sine',.06);
-  tone(660,.35,'triangle',.055,.12);
-  tone(990,.55,'sine',.04,.24);
+  tone(196,.32,'sine',.07);
+  tone(392,.42,'triangle',.06,.12);
+  tone(784,.56,'sine',.047,.28);
+  tone(1174,.72,'triangle',.032,.48);
 }
 
-function finalSound(){
-  tone(262,.28,'sine',.07);
-  tone(392,.35,'triangle',.065,.12);
-  tone(523,.45,'sine',.06,.25);
-  tone(784,.65,'triangle',.05,.42);
-}
-
-function startMusic(){
-  const melody = [
-    [392,.28],[440,.28],[523,.42],[440,.32],[392,.45],[0,.22],
-    [392,.28],[440,.28],[587,.42],[523,.55],[0,.28],
-    [523,.28],[587,.28],[659,.42],[587,.35],[523,.50],[440,.55],[0,.38]
-  ];
-
+function playMusicLoop(){
+  const melody = [392, 440, 523, 494, 392, 440, 587, 523, 392, 784, 659, 523, 494, 440, 698, 659, 523, 587, 523];
+  let i = 0;
   function next(){
     if(!musicStarted || !audioCtx) return;
-    const [freq,dur] = melody[musicIndex % melody.length];
-    if(freq){
-      tone(freq,dur,'sine',.024);
-      tone(freq*2,dur*.66,'triangle',.009,.03);
-    }
-    musicIndex++;
-    musicTimer = setTimeout(next, dur * 1000);
+    const freq = melody[i % melody.length];
+    tone(freq, .42, 'sine', .018);
+    tone(freq * 2, .30, 'triangle', .006, .05);
+    i++;
+    musicTimer = setTimeout(next, 470);
   }
-
   next();
 }
 
-function stopMusicSoon(){
-  setTimeout(stopMusic, 1200);
-}
-
-function stopMusic(){
+function stopAudio(){
   musicStarted = false;
   if(musicTimer){
     clearTimeout(musicTimer);
     musicTimer = null;
   }
-  activeNodes.forEach(node => {
-    try{ node.osc.stop(0); }catch(e){}
-    try{ node.osc.disconnect(); node.gain.disconnect(); }catch(e){}
+  activeNodes.forEach(n => {
+    try{ n.osc.stop(0); }catch(e){}
+    try{ n.osc.disconnect(); n.gain.disconnect(); }catch(e){}
   });
   activeNodes = [];
   if(audioCtx){
     try{ audioCtx.close(); }catch(e){}
     audioCtx = null;
+  }
+}
+
+function updateProgress(){
+  progressBox.textContent = `Butterflies ${collected} / ${TARGET_BUTTERFLIES}`;
+}
+
+function sparkleBurst(x, y, count=18){
+  for(let i=0;i<count;i++){
+    const spark = document.createElement('div');
+    spark.className = 'spark';
+    spark.style.left = x + 'px';
+    spark.style.top = y + 'px';
+    spark.style.setProperty('--x', (Math.random()*170 - 85) + 'px');
+    spark.style.setProperty('--y', (Math.random()*170 - 85) + 'px');
+    sparkLayer.appendChild(spark);
+    setTimeout(() => spark.remove(), 900);
   }
 }
 
@@ -174,238 +176,155 @@ function flashOpen(){
   flash.classList.add('show');
 }
 
-function updateScore(){
-  score.textContent = `Butterflies ${collected} / ${TARGET_BUTTERFLIES}`;
-}
-
-function sparkBurst(x,y,count=18){
-  for(let i=0;i<count;i++){
-    const spark = document.createElement('div');
-    spark.className = 'spark';
-    spark.style.left = x + 'px';
-    spark.style.top = y + 'px';
-    spark.style.setProperty('--x',(Math.random()*160-80)+'px');
-    spark.style.setProperty('--y',(Math.random()*160-80)+'px');
-    app.appendChild(spark);
-    setTimeout(() => spark.remove(), 850);
-  }
-}
-
 function spawnButterfly(initial=false){
   if(!gameRunning) return;
-
-  const b = document.createElement('button');
-  b.className = 'butterfly';
-  b.type = 'button';
-  b.setAttribute('aria-label','Collect butterfly');
-  b.innerHTML = '<span></span>';
+  const butterfly = document.createElement('button');
+  butterfly.className = 'butterfly';
+  butterfly.type = 'button';
+  butterfly.textContent = Math.random() > .5 ? '🦋' : '💙';
 
   const w = app.clientWidth;
   const h = app.clientHeight;
-  const sx = Math.random() * (w - 70) + 12;
-  const sy = initial ? Math.random() * (h * .72) + 60 : h + 60;
-  const dx = Math.random() * 110 - 55;
-  const dy = initial ? Math.random() * 160 - 80 : -(h * (.45 + Math.random() * .45));
-  const dx2 = dx + Math.random() * 130 - 65;
-  const dy2 = dy - 180;
+  const sx = initial ? Math.random() * (w - 70) : -80;
+  const sy = initial ? 80 + Math.random() * (h - 220) : 80 + Math.random() * (h - 180);
+  const ex = w + 100;
+  const ey = 80 + Math.random() * (h - 180);
+  const dur = 6.5 + Math.random() * 2.4;
 
-  b.style.setProperty('--sx',sx + 'px');
-  b.style.setProperty('--sy',sy + 'px');
-  b.style.setProperty('--dx',dx + 'px');
-  b.style.setProperty('--dy',dy + 'px');
-  b.style.setProperty('--dx2',dx2 + 'px');
-  b.style.setProperty('--dy2',dy2 + 'px');
-  b.style.setProperty('--dur',(5.5 + Math.random() * 2.4) + 's');
+  butterfly.style.setProperty('--sx', sx + 'px');
+  butterfly.style.setProperty('--sy', sy + 'px');
+  butterfly.style.setProperty('--ex', ex + 'px');
+  butterfly.style.setProperty('--ey', ey + 'px');
+  butterfly.style.animationDuration = `${dur}s, .7s`;
 
-  let collectedThis = false;
-  const collect = e => {
-    if(e){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    if(collectedThis || !gameRunning) return;
-    collectedThis = true;
-    const r = b.getBoundingClientRect();
-    b.remove();
+  butterfly.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if(!gameRunning) return;
+    const rect = butterfly.getBoundingClientRect();
+    butterfly.remove();
     collected++;
-    updateScore();
-    collectSound();
-    sparkBurst(r.left + r.width/2, r.top + r.height/2, 14);
+    updateProgress();
+    sparkleSound();
+    sparkleBurst(rect.left + rect.width/2, rect.top + rect.height/2, 18);
     if(collected >= TARGET_BUTTERFLIES) finishGame();
-  };
+  }, {once:true});
 
-  b.addEventListener('pointerdown', collect, {once:true});
-  b.addEventListener('animationend', () => b.remove());
-  gameLayer.appendChild(b);
+  butterfly.addEventListener('animationend', () => butterfly.remove());
+  gameLayer.appendChild(butterfly);
 }
 
 function startGame(){
   initAudio();
-  collected = 0;
-  gameRunning = true;
-  gameLayer.innerHTML = '';
-  updateScore();
   show('game');
+  gameLayer.innerHTML = '';
+  collected = 0;
+  updateProgress();
+  gameRunning = true;
   clearInterval(spawnTimer);
-  for(let i=0;i<8;i++) spawnButterfly(true);
-  spawnTimer = setInterval(() => spawnButterfly(false), 680);
+  for(let i=0;i<6;i++) spawnButterfly(true);
+  spawnTimer = setInterval(() => spawnButterfly(false), 850);
 }
 
 function finishGame(){
   gameRunning = false;
   clearInterval(spawnTimer);
   document.querySelectorAll('.butterfly').forEach(b => b.remove());
-  sparkBurst(app.clientWidth/2, app.clientHeight*.45, 45);
-  setTimeout(() => {
-    moonGate.classList.remove('open');
-    show('gift');
-  }, 680);
+  sparkleBurst(app.clientWidth/2, app.clientHeight/2, 50);
+  setTimeout(() => show('bloom'), 620);
 }
 
-function openWish(){
+function openBloom(){
   initAudio();
-  gateSound();
-  moonGate.classList.add('open');
+  openSound();
+  openBloomBtn.classList.add('open');
   flashOpen();
+  sparkleBurst(app.clientWidth/2, app.clientHeight/2, 60);
   setTimeout(() => {
+    openBloomBtn.classList.remove('open');
     show('wish');
-    setTimeout(() => screens.wish.classList.add('ready'), 2300);
-  }, 800);
+  }, 780);
 }
 
-function loadOnePhoto(){
+function tryLoadPhoto(src){
   return new Promise(resolve => {
-    let index = 0;
-
-    function tryNext(){
-      if(index >= PHOTO_SOURCES.length){
-        resolve(null);
-        return;
-      }
-      const img = new Image();
-      const src = PHOTO_SOURCES[index] + '?v=' + Date.now();
-      img.onload = () => resolve(src);
-      img.onerror = () => {
-        index++;
-        tryNext();
-      };
-      img.src = src;
-    }
-
-    tryNext();
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = () => resolve(null);
+    img.src = `${src}?v=${CACHE_VERSION}`;
   });
+}
+
+async function loadMainPhoto(){
+  photoFrame.classList.remove('photoLoaded');
+  mainPhoto.removeAttribute('src');
+
+  for(const src of photoCandidates){
+    const ok = await tryLoadPhoto(src);
+    if(ok){
+      mainPhoto.src = `${ok}?v=${CACHE_VERSION}`;
+      photoFrame.classList.add('photoLoaded');
+      return true;
+    }
+  }
+  console.warn('Birthday photo not found. Rename your image to photos/prathima.jpg or photos/main-photo.jpg');
+  return false;
 }
 
 async function openPhoto(){
   initAudio();
-  photoSound();
+  openSound();
   flashOpen();
-  mainPhoto.removeAttribute('src');
-  photoFrame.classList.remove('hasPhoto');
   show('photo');
-
-  const src = await loadOnePhoto();
-  if(src){
-    mainPhoto.src = src;
-    photoFrame.classList.add('hasPhoto');
-  }
-
-  setTimeout(() => sparkBurst(app.clientWidth/2, app.clientHeight*.46, 50), 650);
+  await loadMainPhoto();
+  setTimeout(() => {
+    photoSound();
+    sparkleBurst(app.clientWidth/2, app.clientHeight/2, 55);
+  }, 350);
 }
 
-function openFinal(){
-  finalSound();
+function finalWish(){
+  initAudio();
+  openSound();
   flashOpen();
-  setTimeout(() => show('final'), 550);
+  sparkleBurst(app.clientWidth/2, app.clientHeight/2, 70);
+  setTimeout(() => show('final'), 500);
 }
 
 function replay(){
-  collected = 0;
-  gameRunning = false;
   clearInterval(spawnTimer);
+  gameRunning = false;
   gameLayer.innerHTML = '';
-  screens.wish.classList.remove('ready');
-  moonGate.classList.remove('open');
+  photoFrame.classList.remove('photoLoaded');
   mainPhoto.removeAttribute('src');
-  photoFrame.classList.remove('hasPhoto');
   show('start');
 }
 
-function bindTap(el, handler){
-  let lastTap = 0;
-  const run = e => {
+function safeTap(handler){
+  return e => {
     if(e){
       e.preventDefault();
       e.stopPropagation();
     }
-    const now = Date.now();
-    if(now - lastTap < 350) return;
-    lastTap = now;
+    if(tapLock) return;
+    tapLock = true;
+    setTimeout(() => tapLock = false, 360);
     handler(e);
   };
-  el.addEventListener('pointerup', run);
-  el.addEventListener('click', run);
 }
 
-bindTap(playBtn, startGame);
-bindTap(moonGate, openWish);
-bindTap(openPhotoBtn, openPhoto);
-bindTap(finalBtn, openFinal);
-bindTap(replayBtn, replay);
+startBtn.addEventListener('pointerup', safeTap(startGame));
+startBtn.addEventListener('click', safeTap(startGame));
+openBloomBtn.addEventListener('pointerup', safeTap(openBloom));
+openBloomBtn.addEventListener('click', safeTap(openBloom));
+photoBtn.addEventListener('pointerup', safeTap(openPhoto));
+photoBtn.addEventListener('click', safeTap(openPhoto));
+finalBtn.addEventListener('pointerup', safeTap(finalWish));
+finalBtn.addEventListener('click', safeTap(finalWish));
+replayBtn.addEventListener('pointerup', safeTap(replay));
+replayBtn.addEventListener('click', safeTap(replay));
 
-function startCanvasMagic(){
-  const particles = [];
-  for(let i=0;i<95;i++){
-    particles.push({
-      x:Math.random()*app.clientWidth,
-      y:Math.random()*app.clientHeight,
-      r:Math.random()*2.2+0.6,
-      vx:Math.random()*0.24-0.12,
-      vy:Math.random()*0.34+0.08,
-      tw:Math.random()*Math.PI*2
-    });
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,app.clientWidth,app.clientHeight);
-    const active = Object.values(screens).some(s => s.classList.contains('active'));
-    if(!active) return;
-
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.tw += .045;
-      if(p.y > app.clientHeight + 12){
-        p.y = -12;
-        p.x = Math.random()*app.clientWidth;
-      }
-      if(p.x < -12) p.x = app.clientWidth + 12;
-      if(p.x > app.clientWidth + 12) p.x = -12;
-
-      const alpha = .28 + (Math.sin(p.tw)+1)*.22;
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = Math.random() > .4 ? '#dffbff' : '#ffe08a';
-      ctx.shadowColor = '#68e7ff';
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    });
-    requestAnimationFrame(draw);
-  }
-
-  if(!particleTimer){
-    particleTimer = true;
-    draw();
-  }
-}
-
-startCanvasMagic();
-
-window.addEventListener('pagehide', stopMusic);
-window.addEventListener('beforeunload', stopMusic);
+window.addEventListener('pagehide', stopAudio);
+window.addEventListener('beforeunload', stopAudio);
 document.addEventListener('visibilitychange', () => {
-  if(document.hidden) stopMusic();
+  if(document.hidden) stopAudio();
 });

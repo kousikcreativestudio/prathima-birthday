@@ -3,93 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Moonlight Birthday Surprise</title>
-  <link rel="stylesheet" href="./style.css?v=1" />
+  <title>Happy Birthday Prathima</title>
+  <link rel="stylesheet" href="./style.css?v=301" />
 </head>
 <body>
-  <main id="app" data-person-name="SAHITYA">
+  <main id="app" data-person-name="PRATHIMA">
     <div id="flash" class="flash"></div>
-    <canvas id="skyCanvas"></canvas>
+    <div id="sparkLayer" class="sparkLayer"></div>
 
-    <!-- 1. START -->
     <section id="startScreen" class="screen active">
-      <div class="auroraBg"></div>
-      <div class="moon"></div>
-      <div class="startStars" aria-hidden="true"></div>
-
-      <div class="startContent">
-        <p class="eyebrow">A new magical birthday story</p>
-        <h1>Moonlight<br>Garden Surprise</h1>
-        <p class="subText">Collect glowing butterflies and unlock one special memory.</p>
+      <div class="skyDecor"></div>
+      <div class="flowerBed"></div>
+      <div class="introCard glassCard">
+        <p class="miniText">A royal garden surprise for</p>
+        <h1>Prathima</h1>
+        <p class="introLine">A night full of roses, butterflies, wishes and one special memory.</p>
       </div>
-
-      <button id="playBtn" class="primaryBtn" type="button">Start Surprise <span>➜</span></button>
-      <p class="bottomHint">Best viewed with sound on ✨</p>
+      <button id="startBtn" class="mainBtn" type="button">Start Surprise</button>
+      <p class="bottomHint">Tap the glowing butterflies to unlock the wish 🦋</p>
     </section>
 
-    <!-- 2. MINI GAME -->
     <section id="gameScreen" class="screen">
-      <div class="auroraBg dark"></div>
-      <div id="gameLayer"></div>
-      <div id="score" class="score">Butterflies 0 / 12</div>
-      <p class="gameHint">Tap each glowing butterfly before it flies away</p>
+      <div class="skyDecor darker"></div>
+      <div id="gameLayer" class="gameLayer"></div>
+      <div id="progressBox" class="progressBox">Butterflies 0 / 8</div>
+      <p class="gameHint">Catch every butterfly before it flies away</p>
     </section>
 
-    <!-- 3. FIRST SURPRISE -->
-    <section id="giftScreen" class="screen">
-      <div class="auroraBg dim"></div>
-      <div class="gateWrap">
-        <p class="gateText">The moon gate is open...</p>
-        <button id="moonGate" class="moonGate" type="button" aria-label="Open moon gate">
-          <span class="gateRing"></span>
-          <span class="gateCore">✦</span>
+    <section id="bloomScreen" class="screen">
+      <div class="skyDecor"></div>
+      <div class="flowerBed tall"></div>
+      <div class="bloomWrap">
+        <p class="miniText">You unlocked a magical bloom</p>
+        <button id="openBloomBtn" class="roseButton" type="button" aria-label="Open birthday bloom">
+          <span class="roseCore"></span>
+          <span class="rosePetal p1"></span>
+          <span class="rosePetal p2"></span>
+          <span class="rosePetal p3"></span>
+          <span class="rosePetal p4"></span>
+          <span class="roseGlow"></span>
         </button>
-        <p class="tapText">Tap the moon crystal</p>
+        <p class="tapText">Tap the glowing rose</p>
       </div>
     </section>
 
-    <!-- 4. WISH -->
     <section id="wishScreen" class="screen">
-      <div class="gardenBg"></div>
-      <div class="wishCard">
-        <p class="wishSmall">Tonight the whole garden is glowing for you</p>
-        <h2 id="wishTitle">Happy Birthday</h2>
-        <h3 id="nameTitle">SAHITYA</h3>
-        <p class="wishQuote">May your smile shine brighter than moonlight and your dreams bloom like flowers.</p>
+      <div class="skyDecor wishSky"></div>
+      <div class="flowerBed tall"></div>
+      <div class="wishCard glassCard">
+        <p class="miniText">Tonight this garden is shining for you</p>
+        <h2>Happy Birthday</h2>
+        <h3>Prathima</h3>
+        <p class="wishLine">May your smile bloom brighter than moonlight and your dreams become as beautiful as flowers.</p>
       </div>
-      <button id="openPhotoBtn" class="photoUnlockBtn" type="button">Open One Special Photo</button>
+      <button id="photoBtn" class="mainBtn photoOpenBtn" type="button">Open One Special Photo</button>
     </section>
 
-    <!-- 5. ONE PHOTO ONLY -->
     <section id="photoScreen" class="screen">
-      <div class="gardenBg blur"></div>
-      <div id="photoStage" class="photoStage">
-        <div class="photoFrame">
-          <div class="photoGlow"></div>
-          <img id="mainPhoto" alt="Special birthday memory" />
-          <div id="photoFallback" class="photoFallback">
-            Upload your one photo as<br><b>photos/main-photo.jpg</b>
-          </div>
-        </div>
-        <p class="photoCaption">One photo. One beautiful memory. 💙</p>
+      <div class="skyDecor photoSky"></div>
+      <div class="photoHeader">
+        <p>One special birthday memory</p>
       </div>
-      <button id="finalBtn" class="finalBtn" type="button">Final Wish</button>
+      <div id="photoFrame" class="singlePhotoFrame">
+        <img id="mainPhoto" alt="Special birthday memory" />
+        <div class="photoFallback" aria-hidden="true"><span>✦</span></div>
+        <div class="frameLight"></div>
+      </div>
+      <button id="finalBtn" class="mainBtn finalBtn" type="button">Final Wish</button>
     </section>
 
-    <!-- 6. FINAL -->
     <section id="finalScreen" class="screen">
-      <div class="auroraBg"></div>
-      <div class="finalPetals" aria-hidden="true"></div>
-      <div class="finalCard">
-        <p class="finalSmall">With love and warm wishes</p>
-        <h1>Happy Birthday</h1>
-        <h2 id="finalName">SAHITYA</h2>
+      <div class="skyDecor finalSky"></div>
+      <div class="flowerBed tall"></div>
+      <div class="finalCard glassCard">
+        <p class="finalTop">With love and warm wishes</p>
+        <h2>Happy Birthday</h2>
+        <h3>Prathima</h3>
         <p>Keep smiling, keep glowing, and keep making every moment special.</p>
-        <button id="replayBtn" class="replayBtn" type="button">Replay Surprise</button>
+        <button id="replayBtn" class="smallBtn" type="button">Replay Surprise</button>
       </div>
     </section>
   </main>
 
-  <script src="./script.js?v=1"></script>
+  <script src="./script.js?v=301"></script>
 </body>
 </html>

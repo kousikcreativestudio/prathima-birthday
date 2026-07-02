@@ -1,5 +1,5 @@
 const TARGET_BUTTERFLIES = 8;
-const CACHE_VERSION = '302';
+const CACHE_VERSION = '303';
 
 const app = document.getElementById('app');
 const flash = document.getElementById('flash');

@@ -107,7 +107,49 @@ body{
 }
 
 .skyDecor.darker{filter:brightness(.78) saturate(1.08)}
-.skyDecor.wishSky{filter:saturate(1.12) brightness(.94)}
+.skyDecor.wishSky{
+  filter:none;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255,247,205,.42) 0 10%, transparent 30%),
+    radial-gradient(circle at 18% 30%, rgba(107,233,255,.24), transparent 28%),
+    radial-gradient(circle at 82% 24%, rgba(255,144,219,.22), transparent 30%),
+    radial-gradient(circle at 50% 68%, rgba(92,144,255,.16), transparent 26%),
+    radial-gradient(circle at 50% 100%, rgba(55,182,129,.22), transparent 24%),
+    linear-gradient(180deg,#07143a 0%, #0b2758 38%, #10295a 58%, #29174c 100%);
+}
+
+#wishScreen::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:10%;
+  width:260px;
+  height:260px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  z-index:1;
+  pointer-events:none;
+  background:radial-gradient(circle, rgba(255,248,223,.28) 0%, rgba(255,231,173,.18) 22%, rgba(158,226,255,.10) 42%, transparent 68%);
+  filter:blur(2px);
+}
+
+#wishScreen::after{
+  content:"";
+  position:absolute;
+  inset:auto 0 0 0;
+  height:34%;
+  z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 12% 100%, rgba(255,134,214,.18) 0 10px, transparent 12px),
+    radial-gradient(ellipse at 26% 92%, rgba(125,238,255,.20) 0 9px, transparent 11px),
+    radial-gradient(ellipse at 39% 98%, rgba(255,218,118,.18) 0 8px, transparent 10px),
+    radial-gradient(ellipse at 55% 92%, rgba(255,154,226,.22) 0 10px, transparent 12px),
+    radial-gradient(ellipse at 72% 100%, rgba(117,232,255,.18) 0 9px, transparent 11px),
+    radial-gradient(ellipse at 86% 92%, rgba(255,224,121,.20) 0 8px, transparent 10px),
+    linear-gradient(0deg, rgba(7,70,52,.62), transparent 72%);
+  opacity:.95;
+}
 .skyDecor.photoSky{filter:saturate(1.1) brightness(.83)}
 .skyDecor.finalSky{filter:saturate(1.2) brightness(.86)}
 
@@ -221,7 +263,7 @@ body{
 .mainBtn{
   position:absolute;
   left:50%;
-  bottom:12%;
+  bottom:max(12%, calc(env(safe-area-inset-bottom) + 34px));
   z-index:6;
   transform:translateX(-50%);
   width:min(82vw,350px);
@@ -474,7 +516,7 @@ body{
   color:rgba(255,255,255,.88);
 }
 
-.photoOpenBtn{bottom:8%}
+.photoOpenBtn{bottom:max(9.5%, calc(env(safe-area-inset-bottom) + 38px))}
 
 .photoHeader{
   position:absolute;
@@ -578,7 +620,7 @@ body{
   box-shadow:inset 0 0 28px rgba(169,248,255,.55), inset 0 0 65px rgba(255,125,223,.20);
 }
 
-.finalBtn{bottom:5.5%; width:min(68vw,270px)}
+.finalBtn{bottom:max(8.5%, calc(env(safe-area-inset-bottom) + 36px)); width:min(68vw,270px)}
 
 .finalCard{
   position:absolute;
@@ -655,8 +697,9 @@ body{
   .introCard{top:12%; padding:24px 16px}
   .wishCard{top:11%; padding:22px 16px}
   .finalCard{top:12%; padding:24px 16px}
-  .mainBtn{bottom:9%; min-height:54px; font-size:18px}
-  .photoOpenBtn{bottom:5.5%}
+  .mainBtn{bottom:max(10%, calc(env(safe-area-inset-bottom) + 32px)); min-height:54px; font-size:18px}
+  .photoOpenBtn{bottom:max(10%, calc(env(safe-area-inset-bottom) + 34px))}
+  .finalBtn{bottom:max(9%, calc(env(safe-area-inset-bottom) + 32px))}
   .singlePhotoFrame{height:60vh; min-height:330px; width:min(78vw,330px)}
 }
 
